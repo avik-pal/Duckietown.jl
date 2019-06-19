@@ -144,7 +144,7 @@ function Simulator(map_name::String=DEFAULT_MAP_NAME, max_steps::Int=DEFAULT_MAX
     sim = Simulator(last_action, wheelVels, speed, cur_pos, cur_angle,
                     step_count, timestamp, fp, done)
 
-    sim.done = _compute_done_reward(sim).done
+    sim.done = _compute_done_reward(sim, nothing).done
     # Initialize the state
     return sim
 end
@@ -170,7 +170,7 @@ function reset!(sim::Simulator)
     # Robot's current speed
     sim.speed = 0f0
 
-    sim.done = _compute_done_reward(sim).done
+    sim.done = _compute_done_reward(sim, nothing).done
     # Generate the first camera image
     obs = render_obs(sim)
 end
@@ -635,24 +635,24 @@ function step!(sim::Simulator, action::Vector{Float32})
     s = render_obs(sim)
     misc = get_agent_info(sim)
 
-    d = _compute_done_reward(sim)
+    d = _compute_done_reward(sim, action)
     sim.done = d.done
     misc["Simulator"]["msg"] = d.done_why
     return s, action, d.reward, sim.done, misc
 end
 
-function _compute_done_reward(sim::Simulator)
+function _compute_done_reward(sim::Simulator, action)
     # If the agent is not in a valid pose (on drivable tiles)
     if !_valid_pose(sim.fixedparams, sim.cur_pos, sim.cur_angle)
         msg = "Stopping the simulator because we are at an invalid pose."
-        #logger.info(msg)
+        @show msg
         reward = REWARD_INVALID_POSE
         done_code = "invalid-pose"
         done = true
     # If the maximum time step count is reached
     elseif sim.step_count ≥ _max_steps(sim)
         msg = "Stopping the simulator because we reached max_steps = $(_max_steps(sim))"
-        #logger.info(msg)
+        @show msg
         done = true
         reward = 0f0
         done_code = "max-steps-reached"
@@ -661,6 +661,13 @@ function _compute_done_reward(sim::Simulator)
         reward = compute_reward(sim, sim.cur_pos, sim.cur_angle, sim.speed)
         msg = ""
         done_code = "in-progress"
+    end
+    if !isnothing(action)
+        for a in action
+            if abs(a) > 1
+                reward -= abs(a) - 1
+            end
+        end
     end
     return DoneRewardInfo(done, msg, reward, done_code)
 end
@@ -819,7 +826,7 @@ function _render_img(fp::FixedSimParams, cur_pos, cur_angle, top_down=true)
     end
 
     # Draw the agent's own bounding box
-    if fp.draw_bbox
+    # if fp.draw_bbox
         #corners = get_agent_corners(pos, angle)
         #gl.glColor3f(1, 0, 0)
         #gl.glBegin(gl.GL_LINE_LOOP)
@@ -828,7 +835,7 @@ function _render_img(fp::FixedSimParams, cur_pos, cur_angle, top_down=true)
         #gl.glVertex3f(corners[2, 0], 0.01, corners[2, 1])
         #gl.glVertex3f(corners[3, 0], 0.01, corners[3, 1])
         #gl.glEnd()
-    end
+    # end
 
     if top_down
         trans_mat = translation_mat(pos...)
