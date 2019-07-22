@@ -61,12 +61,12 @@ function generate_map()
             iter += 1
         end
         if iter >= 20
-            i_min = get_bound(env, eachrow)
+            i_min = get_bound(env, eachrow, i -> max(1, i - 1))
             i_max = get_bound(env, x -> eachrow(reverse(x, dims = 1)),
-                              i -> 31 - i)
-            j_min = get_bound(env, eachcol)
+                              i -> min(30, 32 - i))
+            j_min = get_bound(env, eachcol, i -> max(1, i - 1))
             j_max = get_bound(env, x -> eachcol(reverse(x, dims = 2)),
-                              i -> 31 - i)
+                              i -> min(30, 32 - i))
             for i in i_min:i_max,
                 j in j_min:j_max
                 if env[i, j] == 0
