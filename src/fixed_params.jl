@@ -54,8 +54,10 @@ function FixedSimParams(map_name::String=DEFAULT_MAP_NAME,
                         seed=nothing,
                         distortion::Bool=false,
                         randomize_maps_on_reset::Bool=false,
-						raytrace::Bool=true,
-						train::Bool=false)
+			raytrace::Bool=true,
+			train::Bool=false,
+                        tiles::Union{Nothing, Vector}=nothing,
+                        custom_map::Bool=false)
     #=
     :param map_name:
     :param max_steps:
@@ -78,7 +80,7 @@ function FixedSimParams(map_name::String=DEFAULT_MAP_NAME,
     # first initialize the RNG
     rng = MersenneTwister(seed)
 
-    _map = Map(map_name, domain_rand)
+    _map = Map(map_name, domain_rand, tiles=tiles, custom_map=custom_map)
 
     randomizer, randomization_settings = nothing, nothing
     if domain_rand

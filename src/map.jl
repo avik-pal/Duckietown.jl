@@ -425,19 +425,30 @@ mutable struct Map
     _grid::Grid
 end
 
-function Map(map_name::String, domain_rand::Bool)
+function Map(map_name::String, domain_rand::Bool; tiles = nothing, custom_map::Bool = true)
     ##
     #Load the map layout from a YAML file
     ##
-    map_file_path = get_file_path("src/maps", map_name, "yaml")
-    #logger.debug('loading map file "%s"' % self.map_file_path)
+    if !custom_map
+        map_file_path = get_file_path("src/maps", map_name, "yaml")
 
-    map_data = nothing
-    open(map_file_path, "r") do f
-        map_data = YAML.load(f)
+        map_data = nothing
+        open(map_file_path, "r") do f
+            map_data = YAML.load(f)
+        end
+    else
+        map_file_path = "custom_map"
+
+        tiles === nothing && error("Custom Maps require tile data")
+
+        map_data = Dict(
+            "tile_size"  => 0.585,
+            "tiles"      => tiles,
+            "start_tile" => [0, 0]
+        )
     end
-
+        
     _grid = Grid(map_data, domain_rand)
 
-    Map(map_name, map_file_path, map_data, _grid)
+    return Map(map_name, map_file_path, map_data, _grid)
 end

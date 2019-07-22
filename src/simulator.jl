@@ -151,6 +151,9 @@ function Simulator(; map_name::String=DEFAULT_MAP_NAME, max_steps::Int=DEFAULT_M
     return sim
 end
 
+RandomMapSimulator(;kwargs...) = Simulator(;tiles = generate_random_track(), custom_map = true,
+                                           map_name = "custom map", kwargs...)
+
 function Base.display(io::IO, sim::Simulator)
     print("Simulator($(sim.fixedparams._map.map_name))")
 end
