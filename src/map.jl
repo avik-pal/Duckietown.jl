@@ -444,7 +444,6 @@ function Map(map_name::String, domain_rand::Bool; tiles = nothing, custom_map::B
         map_data = Dict(
             "tile_size"  => 0.585,
             "tiles"      => tiles,
-            "start_tile" => [0, 0]
         )
     end
         

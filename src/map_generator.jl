@@ -34,30 +34,30 @@ function generate_map()
             tile = rand(1:3)
             point = future_position(point, dir)
             if 1 <= point.I[1] <= 30 && 1 <= point.I[2] <= 30
-		        temp = future_position(point, dir)
-		        if 1 <= temp.I[1] <= 30 && 1 <= temp.I[2] <= 30
-		            if env[temp] == 0
-		                env[point] = 10 * tile + dir
-		            else
-		                if tile == 2
-		                    dir_future = (dir + 1) % 4
-		                elseif tile == 3
-		                    dir_future = dir == 0 ? 3 : (dir - 1)
-		                else
-		                    dir_future = dir
-		                end
-		                if dir_future == env[temp] % 10
-		                    env[point] = 10 * tile + dir
-		                end
-		                break
-		            end
-		        else
-		            env[point] = 10 * tile + dir
-		            break
-		        end
+		temp = future_position(point, dir)
+		if 1 <= temp.I[1] <= 30 && 1 <= temp.I[2] <= 30
+		    if env[temp] == 0
+		        env[point] = 10 * tile + dir
 		    else
+		        if tile == 2
+		            dir_future = (dir + 1) % 4
+		        elseif tile == 3
+		            dir_future = dir == 0 ? 3 : (dir - 1)
+		        else
+		            dir_future = dir
+		        end
+		        if dir_future == env[temp] % 10
+		            env[point] = 10 * tile + dir
+		        end
 		        break
 		    end
+		else
+		    # env[point] = 10 * tile + dir
+		    break
+		end
+	    else
+		break
+	    end
             iter += 1
         end
         if iter >= 20
