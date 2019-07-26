@@ -342,7 +342,9 @@ end
 
 function Base.show(io::IO, sim::Simulator)
     map_name = sim.fixedparams._map.map_name
-    print("Simulator($map_name)")
+    current_position = sim.cur_pos
+    current_angle = ((sim.cur_angle % 2π) + 2π) % 2π
+    print("Simulator(Map - $map_name | Current Position - $current_position | Current Angle - $current_angle)")
 end
 
 function close(sim::Simulator) end
@@ -813,7 +815,7 @@ function render_obs(sim::Simulator)
 
         im = raytrace(origin, direction, observation, light, origin, 2)
     else
-        @warn "Rasterization may not work perfectly"
+        # @warn "Rasterization may not work perfectly"
         im = rasterize(cam, observation)#, 0.04f0, 100f0)
     end
 
